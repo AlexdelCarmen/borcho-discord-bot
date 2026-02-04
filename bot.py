@@ -1,5 +1,7 @@
 import discord
 import os
+from discord import Embed
+import time
 
 from dotenv import load_dotenv
 
@@ -22,6 +24,23 @@ async def on_message(message):
     if message.author == client.user: 
         return
     if message.content == "!ping": 
-        await message.channel.send("Pong 🏓")
+        
+        start = time.time()
+        
+        embed = Embed(
+            title="🤖 BorchoBot",
+            description="Sistema activo",
+            color=0x00ffcc
+        )
+        
+        latency = round((time.time() - start) * 1000)
+        
+        embed.add_field(
+            name="🏓Pong",
+            value=f"Latencia: {latency} ms",
+            inline=False
+        )
+        
+        await message.channel.send(embed=embed)
         
 client.run(TOKEN)
