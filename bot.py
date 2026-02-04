@@ -33,7 +33,7 @@ async def on_message(message):
             color=0x00ffcc
         )
         
-        latency = round((time.time() - start) * 1000)
+        latency = round(client.latency * 1000)
         
         embed.add_field(
             name="🏓Pong",
