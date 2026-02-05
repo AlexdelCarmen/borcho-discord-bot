@@ -48,6 +48,6 @@ async def on_message(message):
             inline=False
         )
         
-        await message.channel.send(embed=embed)
+        await channel.send(embed=embed)
         
 client.run(TOKEN)
