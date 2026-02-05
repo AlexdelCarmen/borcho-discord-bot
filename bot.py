@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -21,10 +23,15 @@ async def on_ready():
     
 @client.event 
 async def on_message(message): 
-    if message.author == client.user: 
+    
+
+    if message.author.bot:
         return
+    
     if message.content == "!ping": 
-        
+        channel = client.get_channel(CHANNEL_ID)
+        if channel: 
+            await channel.send("Hola desde BorchoBot 😎")
         start = time.time()
         
         embed = Embed(
