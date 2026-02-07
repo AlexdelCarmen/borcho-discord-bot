@@ -10,8 +10,9 @@ load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-
 STATS_FILE = "stats.json"
+COOLDOWN = 10 #segundos
+
 
 def load_stats (): 
     try: 
@@ -30,6 +31,10 @@ def load_stats ():
 def save_stats(data): 
     with open(STATS_FILE, "w") as f: 
         json.dump(data, f, indent=4)
+
+last_used = {
+    
+}
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -50,13 +55,24 @@ async def on_message(message):
         return
     
     if message.content == "!ping": 
+        user_id = message.author.id
         data["stats"]["pings"] += 1
         save_stats(data)
         channel = client.get_channel(CHANNEL_ID)
+        start = time.time()
         if channel: 
             await channel.send("Hola desde BorchoBot 😎")
-        start = time.time()
-        
+
+        if user_id in last_used: 
+            elapsed = start - last_used[user_id]
+
+            if elapsed < COOLDOWN: 
+                wait = int(COOLDOWN - elapsed)
+                await channel.send(
+                    f"⏳ Espera {wait}s antes de usar !ping otra vez."
+                )
+                return
+
         embed = Embed(
             title="🤖 BorchoBot",
             description="Sistema activo",
@@ -70,7 +86,7 @@ async def on_message(message):
             value=f"Latencia: {latency} ms",
             inline=False
         )
-        
+        last_used[user_id] = start
         await channel.send(embed=embed)
     
     if message.content == "!stats": 
