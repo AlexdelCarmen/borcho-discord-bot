@@ -12,6 +12,7 @@ TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 STATS_FILE = "stats.json"
 COOLDOWN = 10 #segundos
+VERSION = "0.3.0"
 
 
 def load_stats (): 
@@ -103,5 +104,29 @@ async def on_message(message):
             )
             await channel.send(msg)
             
+    if message.content == "!help":
+        channel = client.get_channel(CHANNEL_ID)
+        if channel: 
+            embed = Embed(
+                title=f"🤖 BorchoBot v{VERSION}",
+                description="Menu de ayuda",
+                color=0x00ffcc
+            )
             
+            embed.add_field(
+                name="!ping",
+                value="Testea la latencia del bot",
+                inline=False
+            )
+            embed.add_field(
+                name="!stats",
+                value="Muestra las estadisticas de uso",
+                inline=False
+            )
+            embed.add_field(
+                name="!help",
+                value="Menu de ayuda",
+                inline=False
+            )
+            await channel.send(embed=embed)
 client.run(TOKEN)
