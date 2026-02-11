@@ -1,8 +1,17 @@
 {
     "stats": {
-        "pings": 21,
+        "pings": 22,
         "videos": 0,
         "bans": 0,
-        "streams": 0
+        "streams": 0,
+        "commands": 0,
+        "last_used": 0
+    },
+    "315558870866984972": {
+        "pings": 2,
+        "commands": 4,
+        "bans": 0,
+        "videos": 0,
+        "last_used": 7083134770.739012
     }
 }

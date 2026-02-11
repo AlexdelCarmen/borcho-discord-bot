@@ -13,7 +13,17 @@ CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 STATS_FILE = "stats.json"
 COOLDOWN = 10 #segundos
 VERSION = "0.3.0"
+DEFAULT_STATS = {
+    "pings": 0,
+    "commands": 0,
+    "bans": 0,
+    "videos": 0,
+    "last_used": 0
+                 }
 
+def ensure_user(stats, user_id): 
+    if user_id not in stats: 
+        stats[user_id] = DEFAULT_STATS.copy()
 
 def load_stats (): 
     try: 
@@ -56,9 +66,17 @@ async def on_message(message):
         return
     
     if message.content == "!ping": 
-        user_id = message.author.id
-        data["stats"]["pings"] += 1
+        user_id = str(message.author.id)
+        
+        ensure_user(data, user_id)
+        
+        data[user_id]["commands"] += 1
+        data[user_id]["pings"] += 1
+        data[user_id]["last_used"] += time.time()
+        
         save_stats(data)
+        
+        
         channel = client.get_channel(CHANNEL_ID)
         start = time.time()
         if channel: 
@@ -91,6 +109,15 @@ async def on_message(message):
         await channel.send(embed=embed)
     
     if message.content == "!stats": 
+        user_id = str(message.author.id)
+        
+        ensure_user(data, user_id)
+        
+        data[user_id]["commands"] += 1
+        data[user_id]["last_used"] += time.time()
+        
+        save_stats(data)
+        
         channel = client.get_channel(CHANNEL_ID)
         if channel: 
             await channel.send("Hola desde BorchoBot 😎")
@@ -105,6 +132,17 @@ async def on_message(message):
             await channel.send(msg)
             
     if message.content == "!help":
+        
+        user_id = str(message.author.id)
+        
+        ensure_user(data, user_id)
+        
+        data[user_id]["commands"] += 1
+        data[user_id]["last_used"] += time.time()
+        
+        save_stats(data)        
+        
+        
         channel = client.get_channel(CHANNEL_ID)
         if channel: 
             embed = Embed(
@@ -129,4 +167,9 @@ async def on_message(message):
                 inline=False
             )
             await channel.send(embed=embed)
+            
+    for user in data: 
+        for key in DEFAULT_STATS: 
+            if key not in data[user]: 
+                data[user][key] = DEFAULT_STATS[key]
 client.run(TOKEN)
