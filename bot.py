@@ -65,15 +65,21 @@ async def on_message(message):
     if message.author.bot:
         return
     
+    user_name = message.author.display_name
+    
     if message.content == "!ping": 
         user_id = str(message.author.id)
         
         ensure_user(data, user_id)
         
+        if user_id not in data: 
+            data[user_id] = DEFAULT_STATS.copy()
+            save_stats(data)
+        
         data[user_id]["commands"] += 1
         data[user_id]["pings"] += 1
         data[user_id]["last_used"] += time.time()
-        
+        data["stats"]["pings"] += 1
         save_stats(data)
         
         
@@ -113,23 +119,35 @@ async def on_message(message):
         
         ensure_user(data, user_id)
         
-        data[user_id]["commands"] += 1
-        data[user_id]["last_used"] += time.time()
+        if user_id not in data: 
+            data[user_id] = DEFAULT_STATS.copy()
+            save_stats(data)
         
         save_stats(data)
         
+        
         channel = client.get_channel(CHANNEL_ID)
         if channel: 
-            await channel.send("Hola desde BorchoBot 😎")
-            stats = data["stats"]
-            msg = (
-                f"📊 BorchoBot Stats\n"
-                f"Pings: {stats['pings']}\n"
-                f"Videos: {stats['videos']}\n"
-                f"Bans: {stats['bans']}\n"
-                f"Streams: {stats['streams']}"
+
+            embed = Embed(
+                title=f"📊 Tus estadísticas",
+                description=f"Datos de uso de BorchoBot para {user_name}",
+                color=0x00ffaa
             )
-            await channel.send(msg)
+            
+            embed.add_field(
+                name="Pings",
+                value=f"{data[user_id]["pings"]} veces",
+                inline=False
+            )
+            
+            embed.add_field(
+                name="Comandos",
+                value=f"{data[user_id]["commands"]} veces",
+                inline=False
+            )
+            
+            await channel.send(embed=embed)
             
     if message.content == "!help":
         
@@ -137,9 +155,13 @@ async def on_message(message):
         
         ensure_user(data, user_id)
         
+        if user_id not in data: 
+            data[user_id] = DEFAULT_STATS.copy()
+            save_stats(data)
+        
         data[user_id]["commands"] += 1
         data[user_id]["last_used"] += time.time()
-        
+        data["stats"]["commands"] += 1
         save_stats(data)        
         
         
@@ -148,7 +170,7 @@ async def on_message(message):
             embed = Embed(
                 title=f"🤖 BorchoBot v{VERSION}",
                 description="Menu de ayuda",
-                color=0x00ffcc
+                color=0x00faca
             )
             
             embed.add_field(
