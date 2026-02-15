@@ -28,20 +28,26 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+bot.start_time = time.time()
 
 @bot.event
 async def on_ready():
     print(f"Conectado como {bot.user}")
-
+    print (bot.commands)
+    
 async def main():
     async with bot: 
         await bot.load_extension("cogs.ping")
+        await bot.load_extension("cogs.uptime")
         await bot.start(TOKEN)
 
+@bot.event
+async def on_command_error(ctx, error): 
+    await ctx.send(f"Error: {error}")
+    print(error)
+    
 asyncio.run(main())
     
-
-bot.run(TOKEN)
 
 '''
     def ensure_user(stats, user_id): 
